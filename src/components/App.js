@@ -17,10 +17,33 @@ const App = () => {
     email: "",
     name: "",
     phone: "",
-    webiste: "",
+    website: "",
   });
 
-  const handleOnClick = () => {};
+  const handleOnClick = async() => {
+    if(!userId){
+      setIsLoading(LoadingStatus.NOT_STARTED);
+      return;
+    }
+    setIsLoading(LoadingStatus.IN_PROGRESS);
+    try{
+      const response = await fetch(`${BASE_URL}/${userId}`)
+      const data = await response.json();
+      // console.log(data);
+      setTimeout(() => {
+        setIsLoading(LoadingStatus.SUCCESS);
+        setUserData({
+          id: data.id,
+          email: data.email,
+          name: data.name,
+          phone: data.phone,
+          website: data.website,
+        })
+      }, 2000);
+    }catch(error){
+      console.error(error);
+    }
+  };
 
   const onChangeHandler = (event) => {
     setUserId(event.target.value);
@@ -28,7 +51,7 @@ const App = () => {
 
   return (
     <div id="main">
-      <label htmlFor="number">Enter an id for the user between 1 to 100</label>
+      <label htmlFor="number">Enter an id for the user between 1 to 10</label>
       <input
         type="number"
         value={userId}
@@ -42,12 +65,17 @@ const App = () => {
       </button>
 
       <div id="data">
-        <h1>Click on the button to get the user</h1>
-        <h4 id="id">{userData.id}</h4>
-        <h4 id="email">{userData.email}</h4>
-        <h4 id="name">{userData.name}</h4>
-        <h4 id="phone">{userData.phone}</h4>
-        <h4 id="website">{userData.website}</h4>
+        {isLoading == "NOT_STARTED" ? <h1>Click on the button to get the user</h1>:
+        isLoading == "IN_PROGRESS"? <Loader /> :
+        isLoading == "SUCCESS" ?
+        <>
+          <h4 id="id">{userData.id}</h4>
+          <h4 id="email">{userData.email}</h4>
+          <h4 id="name">{userData.name}</h4>
+          <h4 id="phone">{userData.phone}</h4>
+          <h4 id="website">{userData.website}</h4>
+        </> :""
+        }
       </div>
     </div>
   );
